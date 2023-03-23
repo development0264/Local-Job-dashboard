@@ -152,14 +152,12 @@ def bids(request, pk):
         try:
             bid = BidForJob.objects.get(pk=pk)
         except BidForJob.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({'msg': 'bid not found'},status=status.HTTP_404_NOT_FOUND)
 
         if request.method == 'GET':
             serializers = BidForJobSerializers(bid)
             if serializers.data:
                 return Response(serializers.data)
-            else:
-                return Response({'error': 'Authentication Error'}, status=status.HTTP_400_BAD_REQUEST)
 
         elif request.method == 'PUT':
             serializers = BidForJobSerializers(bid, request.data)
