@@ -21,7 +21,6 @@ from rest_framework.permissions import IsAuthenticated
 @api_view(['GET', 'POST'])
 def Job_list(request):
     if request.user.is_admin:
-        if request.method == 'GET':
             job = Job.objects.all()
             serializers = JobSerializers(job, many=True)
             print("======================admin can see all>>>>>>>>>>>>>",request.user.email)
@@ -123,6 +122,8 @@ def user_feedback(request):
                 serializers.save()
                 return Response(serializers.data, status=status.HTTP_201_CREATED)
             return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({'error': 'Authentication Error'}, status=status.HTTP_400_BAD_REQUEST)
         
 @api_view(['GET', 'POST'])
 def bids_list(request):
@@ -155,7 +156,10 @@ def bids(request, pk):
 
         if request.method == 'GET':
             serializers = BidForJobSerializers(bid)
-            return Response(serializers.data)
+            if serializers.data:
+                return Response(serializers.data)
+            else:
+                return Response({'error': 'Authentication Error'}, status=status.HTTP_400_BAD_REQUEST)
 
         elif request.method == 'PUT':
             serializers = BidForJobSerializers(bid, request.data)
