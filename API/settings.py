@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'user_auth',
     'app',
     'rest_framework_simplejwt',
+    'whitenoise',
 ]
 
 REST_FRAMEWORK = {
