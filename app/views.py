@@ -21,6 +21,13 @@ from rest_framework.permissions import IsAuthenticated
 
 @api_view(['GET', 'POST'])
 def Job_list(request):
+    if request.user.is_admin:
+        if request.method == 'GET':
+            job = Job.objects.all()
+            serializers = JobSerializers(job, many=True)
+            print("======================admin can see all>>>>>>>>>>>>>",request.user.email)
+            return Response(serializers.data)
+        
     if request.user.is_authenticated and request.user.is_verified:
         if request.method == 'GET':
             feedback=UserFeedback.objects.all()
