@@ -1,15 +1,23 @@
 from rest_framework import serializers
+from user_auth.models import ServiceProvider
 from user_auth.models import User_data
 
+
+class ServiceProviderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceProvider
+        fields = "__all__"
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     # We are writing this becoz we need confirm password field in our Registratin Request
     # password2 = serializers.CharField(
     #     style={'input_type': 'password'}, write_only=True)
 
+    # service_provider = ServiceProviderSerializer(many=True)
+
     class Meta:
-        model = User_data
-        fields = ['email', 'first_name', 'last_name', 'contact_no','address', 'password']
+        model = User_data 
+        fields = ['email', 'first_name', 'last_name', 'contact_no','address','password']
         extra_kwargs = {
             'password': {'write_only': True}
         }

@@ -63,18 +63,6 @@ class User_data(AbstractBaseUser):
     contact_no = models.CharField(max_length=12,null=True)
     address = models.CharField(max_length=25,null=True)
     work_exp = models.CharField(max_length=12 ,null=True)
-    Roles = [
-        ("admin", "admin"),
-        ("Customer", "Customer"),
-        ("Packer", "Packer"),
-        ("Farm laborer", "Farm laborer"),
-        ("Gardener", "Gardener"),
-        ("Production worker", "Production worker"),
-        ("Forklift operator", "Forklift operator"),
-        ("Landscape technician", "Landscape technician"),
-        ("Package handler", "Package handler"),
-    ]
-    work_field = models.CharField(max_length=50, choices=Roles,null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
@@ -105,3 +93,18 @@ class User_data(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
 
+class ServiceProvider(models.Model):
+    user = models.ForeignKey(User_data, on_delete=models.CASCADE, null=True)
+    Roles = [
+        ("Packer", "Packer"),
+        ("Farm laborer", "Farm laborer"),
+        ("Gardener", "Gardener"),
+        ("Production worker", "Production worker"),
+        ("Forklift operator", "Forklift operator"),
+        ("Landscape technician", "Landscape technician"),
+        ("Package handler", "Package handler"),
+    ]
+    work_field = models.CharField(max_length=50, choices=Roles,null=True)
+
+    def __str__(self):
+        return str(self.user.email)

@@ -128,6 +128,13 @@ def user_feedback(request):
         
 @api_view(['GET', 'POST'])
 def bids_list(request):
+    if request.user.is_admin:
+        if request.method == 'GET':
+            bid=BidForJob.objects.all().order_by('job_biding_price')
+
+            serializers = BidForJobSerializers(bid, many=True)
+            return Response(serializers.data)
+
     if request.user.is_authenticated and request.user.is_verified:
         if request.method == 'GET':
             bid=BidForJob.objects.all()
@@ -138,11 +145,18 @@ def bids_list(request):
         if (request.method == 'POST'):
             bid = BidForJob.objects.all()
             print(bid)
-            # if user.is_admin :
             serializers = BidForJobSerializers(data=request.data)
+            serializers.is_valid()
+            service_provider = serializers.validated_data.get('service_provider')
+            job =serializers.validated_data.get('job')
+            
+            if BidForJob.objects.filter(service_provider=service_provider, job=job).exists():
+                 return Response({'msg': 'already bid'}, status=status.HTTP_201_CREATED)   
+              
             if serializers.is_valid():
-                serializers.save()
+                serializers.save()    
                 return Response(serializers.data, status=status.HTTP_201_CREATED)
+            
             return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({'error': 'Authentication Error'}, status=status.HTTP_400_BAD_REQUEST)

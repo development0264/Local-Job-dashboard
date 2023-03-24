@@ -80,9 +80,8 @@ class UserLogin(APIView):
             password =serializer.data.get('password')
             user = authenticate(email=email, password=password)            
             if user is not None and user.is_verified:
-                work_field = user.work_field
                 token = str(RefreshToken.for_user(user).access_token)
-                return Response({'token': token , 'msg' : 'Login Successfull','work_field':work_field}, status=status.HTTP_200_OK)
+                return Response({'token': token , 'msg' : 'Login Successfull'}, status=status.HTTP_200_OK)
             if user is None:
                 return Response ({'errors': {'non_field_errors':['Email or password is not valid']}},
                 status=status.HTTP_404_NOT_FOUND)
