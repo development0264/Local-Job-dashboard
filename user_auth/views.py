@@ -84,7 +84,7 @@ class UserLogin(APIView):
                 token = str(RefreshToken.for_user(user).access_token)
                 return Response({'token': token , 'msg' : 'Login Successfull','work_field':work_field}, status=status.HTTP_200_OK)
             else:
-                return Response ({'errors': {'non_field_errors':['Email or password is not valid']}},
+                return Response ({'errors': 'user is not verified'},
                 status=status.HTTP_404_NOT_FOUND)
         return Response (serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
