@@ -50,6 +50,7 @@ class UserRegistrationView(APIView):
         email_body = 'Hi '+user.first_name + ' Use the link below to verify your email \n' + absurl
         data = {'email_body': email_body, 'to_email': user.email,'email_subject': 'Verify your email','user_id':user.id}
         Util.send_email(data)
+        print(data)
         return Response ({'token': token, 'msg': 'Registration Successfull'}, status=status.HTTP_201_CREATED)
 
 class VerifyEmail(APIView):
@@ -78,7 +79,7 @@ class UserLogin(APIView):
             email = serializer.data.get('email')
             password =serializer.data.get('password')
             user = authenticate(email=email, password=password)            
-            if user is not None:
+            if user is not None and user.is_verified:
                 work_field = user.work_field
                 token = str(RefreshToken.for_user(user).access_token)
                 return Response({'token': token , 'msg' : 'Login Successfull','work_field':work_field}, status=status.HTTP_200_OK)
