@@ -76,7 +76,6 @@ class User_data(AbstractBaseUser):
         ("Package handler", "Package handler"),
     ]
     work_field = models.CharField(max_length=50, choices=Roles,null=True)
-    access_token = models.CharField(max_length=500)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
