@@ -64,8 +64,7 @@ class User_data(AbstractBaseUser):
     address = models.CharField(max_length=25,null=True)
     work_exp = models.CharField(max_length=12 ,null=True)
     Roles = [
-        ("manager", "manager"),
-        ("account", "account"),
+        ("admin", "admin"),
         ("Customer", "Customer"),
         ("Packer", "Packer"),
         ("Farm laborer", "Farm laborer"),

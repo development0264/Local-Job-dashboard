@@ -80,7 +80,7 @@ def Job_list(request):
                 return Response(serializers.data, status=status.HTTP_201_CREATED)
             return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response({'error': 'Authentication Error'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Authentication Error \n user must be an admin'}, status=status.HTTP_400_BAD_REQUEST)
     
 
 @api_view(['GET', 'PUT', 'DELETE'])
