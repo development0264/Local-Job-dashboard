@@ -20,6 +20,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 from API.settings import SECRET_KEY
 
+import random
+import string
+
 
 class UserRegistrationView(APIView):
 
@@ -45,12 +48,25 @@ class UserRegistrationView(APIView):
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
 
+        # Generate a random alphanumeric string
+        random_string = ''.join(random.choices(string.ascii_uppercase + string.digits , k=30))
 
-        absurl = 'http://'+str(current_site)+relativeLink+"?token="+str(user.id)
+        # Generate a random index to insert the number 18
+        index = random.randint(0, len(random_string))
+
+        # Insert the number 18 at the random index
+        result = random_string[:index] + str(user.id) + random_string[index:]
+
+        print(result)
+
+        absurl = 'http://'+str(current_site)+relativeLink+"?hS23D="+random_string[:index]+"&tA="+str(user.id)+"&l2xS="+random_string[index:]
         email_body = 'Hi '+user.first_name + ' Use the link below to verify your email \n' + absurl
         data = {'email_body': email_body, 'to_email': user.email,'email_subject': 'Verify your email','user_id':user.id}
         Util.send_email(data)
+        print(absurl)
         print(data)
+        print("=================>current_site========",str(current_site))
+        print("=================>relativeLink========",relativeLink)
         return Response ({'token': token, 'msg': 'Registration Successfull'}, status=status.HTTP_201_CREATED)
 
 class VerifyEmail(APIView):
@@ -58,10 +74,8 @@ class VerifyEmail(APIView):
     serializer_class = EmailVerificationSerializer
 
     def get(self, request):
-        token = request.GET.get('token')
-        uemail = request.GET.get('email')
-        print("========================>Email",token)
-        
+        token = request.GET.get('tA')
+        print("========================>id",token)
         user = User_data.objects.get(id= token)
         user.is_verified = True
         user.save()

@@ -10,8 +10,13 @@ from user_auth.views import UserRegistrationView
 from django.contrib.auth.decorators import login_required, permission_required
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
+
+class CustomPagination(PageNumberPagination):
+    page_size = 5
+
 
 # @permission_required([IsAuthenticated])
 # @permission_required(permission_classes)
@@ -22,8 +27,10 @@ from rest_framework.permissions import IsAuthenticated
 def Job_list(request):
     if request.user.is_admin:
         if request.method == 'GET':
+            paginator = CustomPagination()
             job = Job.objects.all()
-            serializers = JobSerializers(job, many=True)
+            paginated_queryset = paginator.paginate_queryset(job, request)
+            serializers = JobSerializers(paginated_queryset, many=True)
             print("======================admin can see all>>>>>>>>>>>>>",request.user.email)
             return Response(serializers.data)
         
@@ -113,8 +120,11 @@ def Job_details(request, pk):
 def user_feedback(request):
     if request.user.is_authenticated and request.user.is_verified:
         if request.method == 'GET':
+            paginator = CustomPagination()
             feedback = UserFeedback.objects.all()
-            serializers = UserFeedbackSerializers(feedback, many=True)
+            paginated_queryset = paginator.paginate_queryset(feedback, request)
+            serializers = UserFeedbackSerializers(paginated_queryset, many=True)
+            # serializers = UserFeedbackSerializers(feedback, many=True)
             return Response(serializers.data)
 
         elif (request.method == 'POST'):
@@ -130,9 +140,11 @@ def user_feedback(request):
 def bids_list(request):
     if request.user.is_admin:
         if request.method == 'GET':
+            paginator = CustomPagination()
             bid=BidForJob.objects.all().order_by('job_biding_price')
-
-            serializers = BidForJobSerializers(bid, many=True)
+            paginated_queryset = paginator.paginate_queryset(bid, request)
+            serializers = BidForJobSerializers(paginated_queryset, many=True)
+            # serializers = BidForJobSerializers(bid, many=True)
             return Response(serializers.data)
 
     if request.user.is_authenticated and request.user.is_verified:
