@@ -30,6 +30,7 @@ class BidForJob(models.Model):
 
 class UserFeedback(models.Model):
     user = models.ForeignKey(User_data, on_delete=models.CASCADE, null=True)
+    service_provider = models.ForeignKey(ServiceProvider, on_delete=models.CASCADE, null=True)
     job = models.ForeignKey(Job, on_delete=models.CASCADE, null=True)
     feedback = models.CharField(max_length=1000, null=True)
     ratings = models.IntegerField(default=3,validators=[MaxValueValidator(5), MinValueValidator(1)])

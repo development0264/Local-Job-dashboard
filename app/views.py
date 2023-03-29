@@ -40,7 +40,6 @@ def Job_list(request):
             job = Job.objects.all()
             usermail  = request.user.email
             print("======================>>>>>>>>>>>>>",usermail)
-            email = User_data.objects.get(email= usermail)
             average_rating = 0
             total_feedback = 0
             
@@ -50,7 +49,10 @@ def Job_list(request):
                     average_rating += f.ratings
                     if f.ratings == 0:
                         average_rating = 1
+                        total_feedback = 1
                     print(f.ratings)
+            if total_feedback == 0:
+                return Response({'msg': 'user is not eligible to see jobs!!'})
             print("======================>>>>>>>>>>>>>",average_rating)
             average = average_rating/total_feedback
             print("======================>>>>>>>>>>>>>",average_rating,total_feedback,average)
