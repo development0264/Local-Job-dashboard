@@ -44,7 +44,7 @@ def Job_list(request):
             total_feedback = 0
             
             for f in feedback:
-                if f.user.email == usermail:
+                if f.service_provider.user.email == usermail:
                     total_feedback +=1
                     average_rating += f.ratings
                     if f.ratings == 0:
