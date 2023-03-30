@@ -116,7 +116,7 @@ def Job_details(request, pk):
 
         elif request.method == 'DELETE':
             job.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'msg': 'job is deleted'},status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET', 'POST'])
 def user_feedback(request):
@@ -181,7 +181,7 @@ def bids(request, pk):
         try:
             bid = BidForJob.objects.get(pk=pk)
         except BidForJob.DoesNotExist:
-            return Response({'msg': 'bid not found'},status=status.HTTP_404_NOT_FOUND)
+            return Response({'msg': 'bid not found or doesn not exist'},status=status.HTTP_404_NOT_FOUND)
 
         if request.method == 'GET':
             serializers = BidForJobSerializers(bid)
@@ -197,7 +197,7 @@ def bids(request, pk):
 
         elif request.method == 'DELETE':
             bid.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'msg': 'bid is deleted'},status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
 def one_job_bid_list(request, pk):
@@ -216,7 +216,7 @@ def payment(request, pk):
         try:
             bid = BidForJob.objects.get(pk=pk)
         except BidForJob.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({'msg': 'bid not found or doesn not exist'},status=status.HTTP_404_NOT_FOUND)
 
         if request.method == 'GET':
             serializers = PaymentSerializers(bid)
