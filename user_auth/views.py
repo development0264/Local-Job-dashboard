@@ -4,6 +4,7 @@ from urllib import response
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view 
 from .utils import *
 from user_auth.serializers import *
 from django.contrib.auth import authenticate
@@ -74,7 +75,7 @@ class VerifyEmail(APIView):
     serializer_class = EmailVerificationSerializer
 
     def get(self, request):
-        token = request.GET.get('tA')
+        token =  ('tA')
         print("========================>id",token)
         user = User_data.objects.get(id= token)
         user.is_verified = True
@@ -129,3 +130,28 @@ class LogoutView(APIView):
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+@api_view(['GET', 'POST'])
+def service_provider(request):
+    
+    if request.user.is_authenticated and request.user.is_verified:
+        if (request.method == 'POST'):
+            service_provider = ServiceProvider.objects.all()
+            print(service_provider)
+            serializers = ServiceProviderSerializer(data=request.data)
+            serializers.is_valid()
+            user = serializers.validated_data.get('user')
+            work_field =serializers.validated_data.get('work_field')
+            
+            if ServiceProvider.objects.filter(user=user, work_field=work_field).exists():
+                    return Response({'msg': 'user is already register for this service'}, status=status.HTTP_201_CREATED)   
+                
+            if serializers.is_valid():
+                serializers.save()    
+                return Response(serializers.data, status=status.HTTP_201_CREATED)
+            
+            return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({'error': 'Authentication Error'}, status=status.HTTP_400_BAD_REQUEST)

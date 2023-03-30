@@ -98,7 +98,7 @@ def Job_details(request, pk):
     try:
         job = Job.objects.get(pk=pk)
     except Job.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({'msg': 'job does not exist'},status=status.HTTP_404_NOT_FOUND)
 
     if request.user.is_authenticated and request.user.is_verified:
         if request.method == 'GET':
