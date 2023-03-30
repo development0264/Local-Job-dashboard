@@ -62,7 +62,7 @@ class UserRegistrationView(APIView):
         absurl = 'http://'+str(current_site)+relativeLink+"?hS23D="+random_string[:index]+"&tA="+str(user.id)+"&l2xS="+random_string[index:]
         email_body = 'Hi '+user.first_name + ' Use the link below to verify your email \n' + absurl
         data = {'email_body': email_body, 'to_email': user.email,'email_subject': 'Verify your email','user_id':user.id}
-        # Util.send_email(data)
+        Util.send_email(data)
         print(absurl)
         print(data)
         print("=================>current_site========",str(current_site))

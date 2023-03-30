@@ -199,6 +199,17 @@ def bids(request, pk):
             bid.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['GET'])
+def one_job_bid_list(request, pk):
+    if request.user.is_admin:
+        if request.method == 'GET':
+            paginator = CustomPagination()
+            bid=BidForJob.objects.filter(job=pk).order_by('job_biding_price')
+            paginated_queryset = paginator.paginate_queryset(bid, request)
+            serializers = BidForJobSerializers(paginated_queryset, many=True)
+            # serializers = BidForJobSerializers(bid, many=True)
+            return Response(serializers.data)
+
 @api_view(['GET', 'PUT'])
 def payment(request, pk):
     if request.user.is_authenticated and request.user.is_verified:
