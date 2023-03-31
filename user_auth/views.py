@@ -75,7 +75,7 @@ class VerifyEmail(APIView):
     serializer_class = EmailVerificationSerializer
 
     def get(self, request):
-        token = request.data.get('tA')
+        token = request.GET.get('tA')
         print("========================>id",token)
         user = User_data.objects.get(id= token)
         user.is_verified = True
