@@ -17,12 +17,6 @@ from rest_framework.pagination import PageNumberPagination
 class CustomPagination(PageNumberPagination):
     page_size = 5
 
-
-# @permission_required([IsAuthenticated])
-# @permission_required(permission_classes)
-# @authentication_classes([BasicAuthentication])
-# @permission_classes([IsAuthenticated])
-
 @api_view(['GET', 'POST'])
 def Job_list(request):
     if request.user.is_admin:
@@ -81,10 +75,7 @@ def Job_list(request):
 
     if request.user.is_admin:
         if (request.method == 'POST'):
-            user  =  User_data.objects.all()
-            print(user)
-            # if user.is_admin :
-            serializers = JobSerializers(data=request.data)
+            serializers = JobSerializers(data=request.data)         
             if serializers.is_valid():
                 serializers.save()
                 return Response(serializers.data, status=status.HTTP_201_CREATED)
@@ -126,7 +117,6 @@ def user_feedback(request):
             feedback = UserFeedback.objects.all()
             paginated_queryset = paginator.paginate_queryset(feedback, request)
             serializers = UserFeedbackSerializers(paginated_queryset, many=True)
-            # serializers = UserFeedbackSerializers(feedback, many=True)
             return Response(serializers.data)
 
         elif (request.method == 'POST'):
@@ -146,7 +136,6 @@ def bids_list(request):
             bid=BidForJob.objects.all().order_by('job_biding_price')
             paginated_queryset = paginator.paginate_queryset(bid, request)
             serializers = BidForJobSerializers(paginated_queryset, many=True)
-            # serializers = BidForJobSerializers(bid, many=True)
             return Response(serializers.data)
 
     if request.user.is_authenticated and request.user.is_verified:
@@ -165,7 +154,7 @@ def bids_list(request):
             job =serializers.validated_data.get('job')
             
             if BidForJob.objects.filter(service_provider=service_provider, job=job).exists():
-                 return Response({'msg': 'already bid'}, status=status.HTTP_201_CREATED)   
+                return Response({'msg': 'already bid'}, status=status.HTTP_400_BAD_REQUEST)   
               
             if serializers.is_valid():
                 serializers.save()    
@@ -181,7 +170,7 @@ def bids(request, pk):
         try:
             bid = BidForJob.objects.get(pk=pk)
         except BidForJob.DoesNotExist:
-            return Response({'msg': 'bid not found or doesn not exist'},status=status.HTTP_404_NOT_FOUND)
+            return Response({'msg': 'bid not found or doesn not exist'},status=status.HTTP_400_BAD_REQUEST)
 
         if request.method == 'GET':
             serializers = BidForJobSerializers(bid)
@@ -207,7 +196,6 @@ def one_job_bid_list(request, pk):
             bid=BidForJob.objects.filter(job=pk).order_by('job_biding_price')
             paginated_queryset = paginator.paginate_queryset(bid, request)
             serializers = BidForJobSerializers(paginated_queryset, many=True)
-            # serializers = BidForJobSerializers(bid, many=True)
             return Response(serializers.data)
 
 @api_view(['GET', 'PUT'])
