@@ -49,13 +49,8 @@ class UserRegistrationView(APIView):
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
 
-        # Generate a random alphanumeric string
         random_string = ''.join(random.choices(string.ascii_uppercase + string.digits , k=30))
-
-        # Generate a random index to insert the number 18
         index = random.randint(0, len(random_string))
-
-        # Insert the number 18 at the random index
         result = random_string[:index] + str(user.id) + random_string[index:]
 
         print(result)
@@ -71,6 +66,7 @@ class UserRegistrationView(APIView):
         return Response ({'token': token, 'msg': 'Registration Successfull','absurl':absurl}, status=status.HTTP_201_CREATED)
 
 class VerifyEmail(APIView):
+    
     
     serializer_class = EmailVerificationSerializer
 
@@ -112,10 +108,49 @@ class UserProfileView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 from rest_framework import generics
+# class ChangePasswordView(generics.UpdateAPIView):
+#     queryset = User_data.objects.all()
+#     permission_classes = (IsAuthenticated,)
+#     serializer_class = ChangePasswordSerializer
+
+
+
 class ChangePasswordView(generics.UpdateAPIView):
-    queryset = User_data.objects.all()
-    permission_classes = (IsAuthenticated,)
+    """
+    An endpoint for changing password.
+    """
     serializer_class = ChangePasswordSerializer
+    model = User_data
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response({"old_password": "Wrong password."}, status=status.HTTP_400_BAD_REQUEST)
+            if serializer.data.get("new_password") != serializer.data.get("confirm_password"):
+                return Response({"msg": "password not match"}, status=status.HTTP_400_BAD_REQUEST)
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Password updated successfully',
+                'data': []
+            }
+
+            return Response(response)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.response import Response
 from user_auth.models import ServiceProvider
 from user_auth.models import User_data
 
@@ -52,34 +53,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 from django.contrib.auth.password_validation import validate_password
-class ChangePasswordSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
-    token_user_password = serializers.CharField(write_only=True, required=True)
 
-    class Meta:
-        model = User_data
-        fields = ('token_user_password', 'password', 'password2')
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User_data
 
-    def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
-
-        return attrs
-
-    def validate_token_user_password(self, value):
-        user = self.context['request'].user
-        if not user.check_password(value):
-            raise serializers.ValidationError({"token_user_password": "Old password is not correct"})
-        return value
-
-    def update(self, instance, validated_data):
-
-        instance.set_password(validated_data['password'])
-        instance.save()
-
-        return instance
-    
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)
+  
 
 class EmailVerificationSerializer(serializers.ModelSerializer):
     token = serializers.CharField(max_length=555)

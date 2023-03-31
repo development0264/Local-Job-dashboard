@@ -10,11 +10,13 @@ urlpatterns = [
     path('login', csrf_exempt(UserLogin.as_view()), name='login'),
     # path('mapdetails/', MapDetails.as_view(), name='mapdetails'),
     path('userprofile',  csrf_exempt(UserProfileView.as_view()), name='userprofile'),
-    path('change_password/<int:pk>', ChangePasswordView.as_view(), name='auth_change_password'),
+    # path('change_password/<int:pk>', ChangePasswordView.as_view(), name='auth_change_password'),
+    path('change_password', ChangePasswordView.as_view(), name='auth_change_password'),
     # path('logout', LogoutView, name='auth_logout')
     path('logout', LogoutView.as_view(), name='auth_logout'),
+    path('password_reset', include('django_rest_passwordreset.urls', namespace='password_reset')),
 
-    path('api/service_provider', service_provider,name="bids_list"),
+    path('service_provider', service_provider,name="bids_list"),
     # path('changepassword/', UserChangePassword.as_view(), name='changepassword'),
     # path('send-reset-password-email/', SendPasswordResetEmail.as_view(),
     #  name='send-reset-password-email'),

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'app',
     'rest_framework_simplejwt',
     'whitenoise',
+    'django_rest_passwordreset',
 ]
 
 REST_FRAMEWORK = {
