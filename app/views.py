@@ -153,13 +153,13 @@ def bids_list(request):
             serializers.is_valid()
             service_provider = serializers.validated_data.get('service_provider')
             job =serializers.validated_data.get('job')
-            if service_provider.user != request.user and not request.user.is_admin:
-                return Response({'msg': 'user is not current user!!'},status=status.HTTP_400_BAD_REQUEST)     
+            if service_provider.user.email != request.user.email and not request.user.is_admin:
+                return Response({'msg': 'user who is biding is not current user or admin!!'},status=status.HTTP_400_BAD_REQUEST)     
             if BidForJob.objects.filter(service_provider=service_provider, job=job).exists():
-                return Response({'msg': 'already bid'}, status=status.HTTP_400_BAD_REQUEST)   
+                return Response({'msg': 'current user has already bid on this job'},  status=status.HTTP_400_BAD_REQUEST)   
               
             if serializers.is_valid():
-                serializers.save()    
+                serializers.save()
                 return Response(serializers.data, status=status.HTTP_201_CREATED)
             
             return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
