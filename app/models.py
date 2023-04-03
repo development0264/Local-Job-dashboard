@@ -15,7 +15,7 @@ class Job(models.Model):
     pin_code = models.CharField(max_length=1000)
     budget = models.IntegerField(validators=[MaxValueValidator(10000), MinValueValidator(500)])
     def __str__(self):
-        return str(self.job_name)
+        return str(self.job_name) + " " +  str(self.budget)+ " " +  str(self.id)
 
 
 class BidForJob(models.Model):
@@ -34,7 +34,7 @@ class UserFeedback(models.Model):
     service_provider = models.ForeignKey(ServiceProvider, on_delete=models.CASCADE, null=True)
     job = models.ForeignKey(Job, on_delete=models.CASCADE, null=True)
     feedback = models.CharField(max_length=1000, null=True)
-    ratings = models.IntegerField(default=3,validators=[MaxValueValidator(5), MinValueValidator(1)])
+    ratings = models.IntegerField(default=1,validators=[MaxValueValidator(5), MinValueValidator(1)])
     def __str__(self):
         return str(self.user)+" - "+str(self.job)
 

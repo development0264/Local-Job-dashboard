@@ -38,46 +38,29 @@ class UserRegistrationView(APIView):
         user = User_data.objects.get(email=user_data['email'])
 
         token = str(RefreshToken.for_user(user).access_token)
-        print("============",user.email)
-        mail=user.email
         user.access_token = token
         user.save()
-
-        print("===============",request.user)
-        print("=================>User",user.id)
 
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
 
         random_string = ''.join(random.choices(string.ascii_uppercase + string.digits , k=30))
         index = random.randint(0, len(random_string))
-        result = random_string[:index] + str(user.id) + random_string[index:]
 
-        print(result)
-
-        absurl = 'http://'+str(current_site)+relativeLink+"?hS23D="+random_string[:index]+"&tA="+str(user.id)+"&l2xS="+random_string[index:]
-        email_body = 'Hi '+user.first_name + ' Use the link below to verify your email \n' + absurl
-        data = {'email_body': email_body, 'to_email': user.email,'email_subject': 'Verify your email','user_id':user.id}
+        absurl = f'http://{current_site}{relativeLink}?hS23D={random_string[:index]}&tA={user.id}&l2xS={random_string[index:]}'
+        email_body = f'Hi {user.first_name}, use the link below to verify your email:\n{absurl}'
+        data = {'email_body': email_body, 'to_email': user.email, 'email_subject': 'Verify your email', 'user_id': user.id}
         Util.send_email(data)
-        print(absurl)
-        print(data)
-        print("=================>current_site========",str(current_site))
-        print("=================>relativeLink========",relativeLink)
-        return Response ({'token': token, 'msg': 'Registration Successfull','absurl':absurl}, status=status.HTTP_201_CREATED)
+
+        return Response({'token': token, 'msg': 'Registration successful', 'absurl': absurl}, status=status.HTTP_201_CREATED)
 
 class VerifyEmail(APIView):
-    
-    
     serializer_class = EmailVerificationSerializer
-
     def get(self, request):
         token = request.GET.get('tA')
-        print("========================>id",token)
         user = User_data.objects.get(id= token)
         user.is_verified = True
         user.save()
-
-        print("==================",token)
         return Response({'email': 'Successfully activated'}, status=status.HTTP_200_OK)
 
 
@@ -108,17 +91,7 @@ class UserProfileView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 from rest_framework import generics
-# class ChangePasswordView(generics.UpdateAPIView):
-#     queryset = User_data.objects.all()
-#     permission_classes = (IsAuthenticated,)
-#     serializer_class = ChangePasswordSerializer
-
-
-
 class ChangePasswordView(generics.UpdateAPIView):
-    """
-    An endpoint for changing password.
-    """
     serializer_class = ChangePasswordSerializer
     model = User_data
     permission_classes = (IsAuthenticated,)
@@ -130,7 +103,6 @@ class ChangePasswordView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         self.object = self.get_object()
         serializer = self.get_serializer(data=request.data)
-
         if serializer.is_valid():
             # Check old password
             if not self.object.check_password(serializer.data.get("old_password")):
@@ -146,9 +118,7 @@ class ChangePasswordView(generics.UpdateAPIView):
                 'message': 'Password updated successfully',
                 'data': []
             }
-
             return Response(response)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -160,13 +130,9 @@ class LogoutView(APIView):
             refresh_token = request.data["refresh_token"]
             token = RefreshToken(refresh_token)
             token.blacklist()
-
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-
 
 @api_view(['GET', 'POST'])
 def service_provider(request):
@@ -185,8 +151,7 @@ def service_provider(request):
                 
             if serializers.is_valid():
                 serializers.save()    
-                return Response(serializers.data, status=status.HTTP_201_CREATED)
-            
+                return Response(serializers.data, status=status.HTTP_201_CREATED)            
             return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({'error': 'Authentication Error'}, status=status.HTTP_400_BAD_REQUEST)

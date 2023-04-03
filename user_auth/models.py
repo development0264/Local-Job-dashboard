@@ -1,7 +1,7 @@
 from os import access
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
 
@@ -105,9 +105,10 @@ class ServiceProvider(models.Model):
         ("Package handler", "Package handler"),
     ]
     work_field = models.CharField(max_length=50, choices=Roles,null=True)
+    ratings = models.FloatField(default=3,validators=[MaxValueValidator(5), MinValueValidator(1)])
 
     def __str__(self):
-        return str(self.user.email)
+        return str(self.user.email) + " " + str(self.id)+ " " + str(self.ratings)
     
 
     
