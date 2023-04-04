@@ -8,11 +8,12 @@ from django.core.validators import RegexValidator
 class Job(models.Model):
 
     user = models.ForeignKey(User_data, on_delete=models.CASCADE, null=True)
-    job_name = models.CharField(max_length=1000, validators=[RegexValidator(r'^[a-zA-Z]+$')])
+    job_name = models.CharField(max_length=1000, validators=[RegexValidator(regex=r'^[a-zA-Z]+$',message='Field must contain only alphabetical characters.',code='invalid_field')])
     job_location = models.CharField(max_length=1000)
     address = models.CharField(max_length=1000)
-    contact = models.CharField(max_length=1000)
-    pin_code = models.CharField(max_length=1000)
+    contact = models.CharField(max_length=10, validators=[RegexValidator(regex=r'^\d{10}$',message="Contact Field must contain only 10 digits",code='invalid_field')])
+    pin_code = models.CharField(max_length=10, validators=[RegexValidator(regex=r'^\d{1,10}$',
+        message="Field must contain only digits",code='invalid_field')])
     budget = models.IntegerField(validators=[MaxValueValidator(10000), MinValueValidator(500)])
     def __str__(self):
         return str(self.job_name) + " " +  str(self.budget)+ " " +  str(self.id)
@@ -37,5 +38,3 @@ class UserFeedback(models.Model):
     ratings = models.IntegerField(default=1,validators=[MaxValueValidator(5), MinValueValidator(1)])
     def __str__(self):
         return str(self.user)+" - "+str(self.job)
-
- 

@@ -91,6 +91,10 @@ class UserProfileView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 from rest_framework import generics
+import re
+def has_password_chars(password):
+    pattern = r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$'
+    return bool(re.match(pattern, password))
 class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
     model = User_data
@@ -107,9 +111,14 @@ class ChangePasswordView(generics.UpdateAPIView):
             # Check old password
             if not self.object.check_password(serializer.data.get("old_password")):
                 return Response({"old_password": "Wrong password."}, status=status.HTTP_400_BAD_REQUEST)
+            if len(serializer.data.get("new_password"))<=8:
+                print("=======================.............",serializer.data.get("new_password"))
+                print("=======================......type...",type(serializer.data.get("new_password")))
+                return Response({"new_password": "password at least have 8 characters"}, status=status.HTTP_400_BAD_REQUEST)
+            if has_password_chars(serializer.data.get("new_password")) == False:
+                return Response({"new_password": "password must have at least one uppercase letter, \n at least one lowercase letter, \n at least least one digit, \n at least one special character"}, status=status.HTTP_400_BAD_REQUEST)
             if serializer.data.get("new_password") != serializer.data.get("confirm_password"):
                 return Response({"msg": "password not match"}, status=status.HTTP_400_BAD_REQUEST)
-            # set_password also hashes the password that the user will get
             self.object.set_password(serializer.data.get("new_password"))
             self.object.save()
             response = {

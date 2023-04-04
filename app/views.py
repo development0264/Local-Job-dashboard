@@ -63,13 +63,16 @@ def Job_details(request, pk):
         job = Job.objects.get(pk=pk)
     except Job.DoesNotExist:
         return Response({'msg': 'job does not exist'},status=status.HTTP_404_NOT_FOUND)
-    try:
-        service_provider = ServiceProvider.objects.get(user=request.user)
-    except ServiceProvider.DoesNotExist:
-        return Response({'msg': 'user is not service Provider or Admin'})
 
     if request.user.is_authenticated and request.user.is_verified:
-        if request.method == 'GET':                    
+        if request.method == 'GET': 
+            if request.user.is_admin:
+                serializers = JobSerializers(job)
+                return Response(serializers.data)
+            try:
+                service_provider = ServiceProvider.objects.get(user=request.user)
+            except ServiceProvider.DoesNotExist:
+                return Response({'msg': 'user is not service Provider or Admin'})
             if service_provider.ratings <= 2:
                 max_budget = 2000
             elif service_provider.ratings < 4:
@@ -109,8 +112,6 @@ def user_feedback(request):
 
         elif (request.method == 'POST'):
             serializers = UserFeedbackSerializers(data=request.data)
-            
-            
             if serializers.is_valid():
                 current_user = serializers.validated_data.get('user')
                 ratings = serializers.validated_data.get('ratings')
@@ -174,8 +175,6 @@ def bids(request, pk):
         except BidForJob.DoesNotExist:
             return Response({'msg': 'bid not found or does not exist'},status=status.HTTP_400_BAD_REQUEST)
 
-        if bid.service_provider.user != request.user and not request.user.is_admin:
-            return Response({'msg': 'user is not Current User or Admin'},status=status.HTTP_400_BAD_REQUEST)
             
         if request.method == 'GET':
             serializers = BidForJobSerializers(bid)
@@ -195,6 +194,20 @@ def bids(request, pk):
         elif request.method == 'DELETE':
             bid.delete()
             return Response({'msg': 'bid is deleted'},status=status.HTTP_204_NO_CONTENT)
+        
+@api_view(['GET'])
+def job_wise_bids(request, pk):
+    if request.user.is_authenticated and request.user.is_verified:
+        try:
+            job = Job.objects.get(pk=pk)
+        except Job.DoesNotExist:
+            return Response({'msg': 'job not found or does not exist'},status=status.HTTP_400_BAD_REQUEST)
+
+        bid = BidForJob.objects.filter(job=job).order_by('job_biding_price')
+        
+        if request.method == 'GET':
+            serializers = BidForJobSerializers(bid, many=True)
+            return Response(serializers.data)
 
 @api_view(['GET', 'PUT'])
 def payment(request, pk):
