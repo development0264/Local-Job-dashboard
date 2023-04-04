@@ -96,7 +96,7 @@ def Job_details(request, pk):
 
         elif request.method == 'DELETE':
             job.delete()
-            return Response({'msg': 'job is deleted'},status=status.HTTP_204_NO_CONTENT)
+            return Response({'msg': 'job is deleted'},status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({'error': 'Authentication Error user must be an admin'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -193,7 +193,7 @@ def bids(request, pk):
 
         elif request.method == 'DELETE':
             bid.delete()
-            return Response({'msg': 'bid is deleted'},status=status.HTTP_204_NO_CONTENT)
+            return Response({'msg': 'bid is deleted'},status=status.HTTP_400_BAD_REQUEST)
         
 @api_view(['GET'])
 def job_wise_bids(request, pk):
