@@ -2,6 +2,7 @@ from os import access
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import RegexValidator  
 
 # Create your models here.
 
@@ -55,12 +56,12 @@ class User_data(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
-    first_name = models.CharField(max_length=25)
-    last_name = models.CharField(max_length=25)
+    first_name = models.CharField(max_length=25, validators=[RegexValidator(regex=r'^[a-zA-Z]+$',message='Field must contain only alphabetical characters.',code='invalid_field')])
+    last_name = models.CharField(max_length=25, validators=[RegexValidator(regex=r'^[a-zA-Z]+$',message='Field must contain only alphabetical characters.',code='invalid_field')])
     date_of_birth = models.DateField(null=True)
     upload_image = models.ImageField(upload_to ='image_uploads/',null=True)
     upload_id_proof = models.FileField(upload_to ='ID_proof_uploads/',null=True)
-    contact_no = models.CharField(max_length=12,null=True)
+    contact_no = models.CharField(max_length=12,null=True, validators=[RegexValidator(regex=r'^\d{10}$',message="Contact Field must contain only 10 digits",code='invalid_field')])
     address = models.CharField(max_length=25,null=True)
     work_exp = models.CharField(max_length=12 ,null=True)
     is_active = models.BooleanField(default=True)
