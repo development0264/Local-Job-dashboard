@@ -76,7 +76,7 @@ class UserLogin(APIView):
             if user is not None and user.is_verified:
                 token = str(RefreshToken.for_user(user).access_token)
                 return Response({'token': token , 'msg' : 'Login Successfull'}, status=status.HTTP_200_OK)
-            if user is None:
+            elif user is None:
                 return Response ({'errors': {'non_field_errors':['Email or password is not valid']}},
                 status=status.HTTP_404_NOT_FOUND)
             else:
@@ -111,13 +111,13 @@ class ChangePasswordView(generics.UpdateAPIView):
             # Check old password
             if not self.object.check_password(serializer.data.get("old_password")):
                 return Response({"old_password": "Wrong password."}, status=status.HTTP_400_BAD_REQUEST)
-            if len(serializer.data.get("new_password"))<=8:
+            elif len(serializer.data.get("new_password"))<=8:
                 print("=======================.............",serializer.data.get("new_password"))
                 print("=======================......type...",type(serializer.data.get("new_password")))
                 return Response({"new_password": "password at least have 8 characters"}, status=status.HTTP_400_BAD_REQUEST)
-            if has_password_chars(serializer.data.get("new_password")) == False:
+            elif has_password_chars(serializer.data.get("new_password")) == False:
                 return Response({"new_password": "password must have at least one uppercase letter, \n at least one lowercase letter, \n at least least one digit, \n at least one special character"}, status=status.HTTP_400_BAD_REQUEST)
-            if serializer.data.get("new_password") != serializer.data.get("confirm_password"):
+            elif serializer.data.get("new_password") != serializer.data.get("confirm_password"):
                 return Response({"msg": "password not match"}, status=status.HTTP_400_BAD_REQUEST)
             self.object.set_password(serializer.data.get("new_password"))
             self.object.save()
@@ -158,7 +158,7 @@ def service_provider(request):
             if ServiceProvider.objects.filter(user=user, work_field=work_field).exists():
                     return Response({'msg': 'user is already register for this service'}, status=status.HTTP_201_CREATED)   
                 
-            if serializers.is_valid():
+            elif serializers.is_valid():
                 serializers.save()    
                 return Response(serializers.data, status=status.HTTP_201_CREATED)            
             return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)

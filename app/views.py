@@ -29,6 +29,7 @@ def Job_list(request):
             serializers = JobSerializers(paginated_queryset, many=True)
             return Response(serializers.data)
         
+        
     if request.user.is_authenticated and request.user.is_verified:
         if request.method == 'GET':                    
             try:
@@ -120,7 +121,7 @@ def user_feedback(request):
                 if current_user != request.user and not request.user.is_admin:
                     return Response({'msg': 'user is not current user!'}, status=status.HTTP_400_BAD_REQUEST)
 
-                if UserFeedback.objects.filter(user=current_user, service_provider=service_provider).exists():
+                elif UserFeedback.objects.filter(user=current_user, service_provider=service_provider).exists():
                     return Response({'msg': 'user has already gave feedback to this service provider'}, status=status.HTTP_400_BAD_REQUEST)
                 sp = ServiceProvider.objects.get(id = service_provider.id)
                 sp.ratings = (sp.ratings + ratings)/2
@@ -147,7 +148,7 @@ def bids_list(request):
             serializers = BidForJobSerializers(bid, many=True)
             return Response(serializers.data)
         
-        if (request.method == 'POST'):
+        elif (request.method == 'POST'):
             bid = BidForJob.objects.all()
             print(bid)
             serializers = BidForJobSerializers(data=request.data)
@@ -156,10 +157,10 @@ def bids_list(request):
             job =serializers.validated_data.get('job')
             if service_provider.user.email != request.user.email and not request.user.is_admin:
                 return Response({'msg': 'user who is biding is not current user or admin!!'},status=status.HTTP_400_BAD_REQUEST)     
-            if BidForJob.objects.filter(service_provider=service_provider, job=job).exists():
+            elif BidForJob.objects.filter(service_provider=service_provider, job=job).exists():
                 return Response({'msg': 'current user has already bid on this job'},  status=status.HTTP_400_BAD_REQUEST)   
               
-            if serializers.is_valid():
+            elif serializers.is_valid():
                 serializers.save()
                 return Response(serializers.data, status=status.HTTP_201_CREATED)
             
@@ -193,7 +194,7 @@ def bids(request, pk):
 
         elif request.method == 'DELETE':
             bid.delete()
-            return Response({'msg': 'bid is deleted'},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'msg': 'bid is deleted'},status=status.HTTP_204_NO_CONTENT)
         
 @api_view(['GET'])
 def job_wise_bids(request, pk):
@@ -226,7 +227,7 @@ def payment(request, pk):
             serializers = BidForJobSerializers(bid, request.data)
             if serializers.is_valid():
                 serializers.save()
-                if bid.job_completed == True:
+                if bid.job_completed:
                     return Response({'msg': 'Payment Done'})
                 else:
                     return Response({'msg': 'Payment Pending'})
